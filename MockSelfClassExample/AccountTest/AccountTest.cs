@@ -47,18 +47,32 @@ namespace Account.Test
             var account = new Mock<Account>(mock.Object) { CallBase =true};
 
             // The method of MeetThief must be can override.
+            // The method of MeetThief will not be executed on Account
             const int thiefFriendly = 1;
             account.Setup(x => x.MeetThief()).Returns(thiefFriendly);
 
             // The method of FixMachine must be can override.
-            account.Protected().Setup<int>("FixMachine").Returns(money); 
+            // The method of FixMachine will not be executed on Account
+            account.Protected().Setup<int>("FixMachine").Returns(money);
 
+            // It.IsAny can only be used in public or internal.
+            // If you use It.IsAny in Protected(), it will only be regarded as the default value of the type
+            //account.Protected().Setup<int>("MachineGotVirus", It.IsAny<double>()).Returns(money);
+
+            // The method of MachineGotVirus must be can override.
+            // The method of MachineGotVirus will not be executed on Account
+            // If you use Protected(), you must use ItExpr.IsAny to execute normally.
+            account.Protected().Setup<int>("MachineGotVirus", ItExpr.IsAny<double>()).Returns(money);
 
             //Act
             account.Object.GenerateTenPercentInterest();
 
             //Assert
             Assert.AreEqual(money, account.Object.Money);
+
+            account.Verify<int>(x => x.MeetThief(), Times.Once());
+            //account.Protected().Verify<int>("MachineGotVirus", Times.Once(),It.IsAny<double>());//error
+            account.Protected().Verify<int>("MachineGotVirus", Times.Once(), ItExpr.IsAny<double>());// success
         }
     }
 }

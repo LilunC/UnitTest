@@ -34,6 +34,7 @@ namespace Account
 
             Money = MeetThief();
             Money = MachineBroken();
+            Money = MachineGotVirus();
             Money = FixMachine();
         }
 
@@ -51,6 +52,13 @@ namespace Account
 
             var errorValue = int.MinValue;
             return errorValue;
+        }
+        protected virtual int MachineGotVirus(double moneyTimes = 0.1)
+        {
+            Console.WriteLine("[Method Call] Account : MachineBroken");
+
+            var errorValue = Money * moneyTimes;
+            return (int)errorValue;
         }
         protected virtual int FixMachine()
         {
